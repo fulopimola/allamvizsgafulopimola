@@ -125,9 +125,19 @@ Button.ClickListener {
 		// Validate username and password with database here. For examples sake
 		// I use a dummy username and password.
 		//
-		boolean isValid = username.equals("test@test.com")
-				&& password.equals("passw0rd");
+		//boolean isValid = username.equals("test@test.com")
+		//		&& password.equals("passw0rd");
 
+		boolean isValid = false;
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		if(isValid){
 			// Store the current user in the service session
 			getSession().setAttribute("user", username);
