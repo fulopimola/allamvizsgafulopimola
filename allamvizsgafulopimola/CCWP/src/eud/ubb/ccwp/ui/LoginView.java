@@ -14,6 +14,11 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
 
+import edu.ubb.ccwp.dao.DAOFactory;
+import edu.ubb.ccwp.dao.UserDAO;
+import edu.ubb.ccwp.exception.DAOException;
+import edu.ubb.ccwp.exception.UserNotFoundException;
+import edu.ubb.ccwp.logic.Hash;
 import edu.ubb.ccwp.model.User;
 
 
@@ -131,19 +136,29 @@ Button.ClickListener {
 		boolean isValid = false;
 		
 		
-		
-		
-		
-		
-		
-		
+		try {
+			DAOFactory df = DAOFactory.getInstance();
+			UserDAO ud = df.getUserDAO();
+			User u;
+			u = ud.getUserByUserName(username);
+			if(u.getPassword().equals(Hash.hashString(password))){
+				isValid = true;
+			}
+			
+		} catch (DAOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UserNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		if(isValid){
 			// Store the current user in the service session
 			getSession().setAttribute("user", username);
 
 			// Navigate to main view
-			getUI().getNavigator().navigateTo("main");
+			getUI().getNavigator().navigateTo(InitPage.NAME);
 
 		} else {
 
