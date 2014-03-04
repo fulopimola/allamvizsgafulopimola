@@ -17,22 +17,21 @@ import edu.ubb.ccwp.model.User;
 
 
 public class InitPage extends VerticalLayout implements View {
-	private Navigator navigator;
+	public static final String NAME = "";
 	
-    public InitPage(final Navigator navi) {
+    public InitPage() {
         setSizeFull();
-        navigator = navi;
         
         User user = new User();
-        user.setUserName("guest");
-        BasePageUI base = new BasePageUI(user, navigator);
+        user.setUserName("Guest");
+        BasePageUI base = new BasePageUI(user);
 		this.addComponent(base);
         
         Button button = new Button("Go to Main View",
                 new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
-                navigator.navigateTo("main");
+            	getUI().getNavigator().navigateTo(MainView.NAME);
             }
         });
         

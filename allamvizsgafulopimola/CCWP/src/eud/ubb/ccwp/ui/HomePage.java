@@ -18,7 +18,7 @@ import edu.ubb.ccwp.model.User;
 public class HomePage extends UI {
 
 	Navigator navigator;
-	protected static final String MAINVIEW = "main";
+	protected static final String NAME = "init";
 
 	@WebServlet(value = "/*", asyncSupported = true)
 	@VaadinServletConfiguration(productionMode = false, ui = HomePage.class)
@@ -34,9 +34,9 @@ public class HomePage extends UI {
 		getPage().setTitle("Valami");
 
 		navigator = new Navigator(this, this);
-		navigator.addView("", new InitPage(navigator));
-		navigator.addView(MAINVIEW, new MainView(navigator));
-
+		navigator.addView(InitPage.NAME, new InitPage());
+		navigator.addView(MainView.NAME, new MainView());
+		navigator.addView(LoginView.NAME, new LoginView());
 	}
 
 

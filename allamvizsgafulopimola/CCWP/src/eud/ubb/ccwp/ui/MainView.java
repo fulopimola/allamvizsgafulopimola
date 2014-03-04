@@ -12,8 +12,8 @@ import edu.ubb.ccwp.model.User;
 
 public class MainView extends VerticalLayout implements View {
     Panel panel;
-    Navigator navigator;
-
+    public static final String NAME = "main";
+    
     // Menu navigation button listener
     class ButtonListener implements ClickListener {
 
@@ -24,16 +24,15 @@ public class MainView extends VerticalLayout implements View {
 
         public void buttonClick(ClickEvent event) {
             // Navigate to a specific state
-            navigator.navigateTo("main" + "/" + menuitem);
+        	getUI().getNavigator().navigateTo("main" + "/" + menuitem);
         }
     }
 
-    public MainView(Navigator nav) {
+    public MainView() {
         setSizeFull();
-        navigator = nav;
         User user = new User();
         user.setUserName("guest");
-        BasePageUI base = new BasePageUI(user, navigator);
+        BasePageUI base = new BasePageUI(user);
 		this.addComponent(base);
         // Layout with menu on left and view area on right
         HorizontalLayout hLayout = new HorizontalLayout();
@@ -75,7 +74,7 @@ public class MainView extends VerticalLayout implements View {
                    new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
-                navigator.navigateTo("");
+            	getUI().getNavigator().navigateTo(InitPage.NAME);
             }
         });
         addComponent(logout);
