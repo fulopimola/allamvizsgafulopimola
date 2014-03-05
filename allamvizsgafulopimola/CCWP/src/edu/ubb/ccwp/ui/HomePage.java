@@ -22,6 +22,7 @@ public class HomePage extends UI {
 
 	@WebServlet(value = "/*", asyncSupported = true)
 	@VaadinServletConfiguration(productionMode = false, ui = HomePage.class)
+	
 	public static class Servlet extends VaadinServlet {
 
 	}
@@ -32,11 +33,12 @@ public class HomePage extends UI {
 		// TODO Auto-generated method stub
 
 		getPage().setTitle("Valami");
-
+		
 		navigator = new Navigator(this, this);
-		navigator.addView(InitPage.NAME, new InitPage());
-		navigator.addView(MainView.NAME, new MainView());
-		navigator.addView(LoginView.NAME, new LoginView());
+		navigator.addView(InitPage.NAME, InitPage.class);
+		navigator.addView(MainView.NAME, MainView.class);
+		navigator.addView(LoginView.NAME, LoginView.class);
+		navigator.addView(RegistrationView.NAME, RegistrationView.class);
 	}
 
 
