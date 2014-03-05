@@ -3,6 +3,7 @@ package edu.ubb.ccwp.dao;
 import com.vaadin.ui.TextField;
 
 import edu.ubb.ccwp.exception.DAOException;
+import edu.ubb.ccwp.exception.UserNameExistsException;
 import edu.ubb.ccwp.exception.UserNotFoundException;
 import edu.ubb.ccwp.model.User;
 
@@ -17,6 +18,6 @@ public interface UserDAO {
 	 *             in case there is no such user in the database
 	 */
 	User getUserByUserID(int userID) throws DAOException, UserNotFoundException;
-
 	User getUserByUserName(String userName) throws DAOException, UserNotFoundException;
+	User insertUser(User user) throws DAOException, UserNameExistsException;
 }
