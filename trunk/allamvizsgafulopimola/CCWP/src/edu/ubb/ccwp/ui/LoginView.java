@@ -1,7 +1,9 @@
 package edu.ubb.ccwp.ui;
 
+import java.util.Arrays;
+
 import com.vaadin.data.validator.AbstractValidator;
-import com.vaadin.data.validator.EmailValidator;
+import com.vaadin.data.validator.StringLengthValidator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.ui.MarginInfo;
@@ -12,7 +14,6 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.Reindeer;
 
 import edu.ubb.ccwp.dao.DAOFactory;
 import edu.ubb.ccwp.dao.UserDAO;
@@ -22,6 +23,7 @@ import edu.ubb.ccwp.logic.Hash;
 import edu.ubb.ccwp.model.User;
 
 
+@SuppressWarnings("serial")
 public class LoginView extends CustomComponent implements View,
 Button.ClickListener {
 
@@ -30,6 +32,7 @@ Button.ClickListener {
 	private final TextField user;
 	private final PasswordField password;
 	private final Button loginButton;
+	private final Button registration;
 
 	public LoginView() {
 		setSizeFull();
@@ -43,8 +46,11 @@ Button.ClickListener {
 		user.setWidth("300px");
 		user.setRequired(true);
 		user.setInputPrompt("Your username (eg. joe@email.com)");
-		user.addValidator(new EmailValidator("Username must be an email address"));
-		user.setInvalidAllowed(false);
+		//user.addValidator(new EmailValidator("Username must be an email address"));
+		user.addValidator(new StringLengthValidator(
+			    "The name must be 1-10 letters (was {0})",
+			    1, 10, true));
+		//user.setInvalidAllowed(false);
 
 		// Create the password input field
 		password = new PasswordField("Password:");
@@ -56,9 +62,16 @@ Button.ClickListener {
 
 		// Create login button
 		loginButton = new Button("Login", this);
-
+		registration  = new Button("Registration",
+                new Button.ClickListener() {
+            @Override
+            public void buttonClick(ClickEvent event) {
+            	getUI().getNavigator().navigateTo(RegistrationView.NAME);
+            }
+        });
+		
 		// Add both to a panel
-		VerticalLayout fields = new VerticalLayout(user, password, loginButton);
+		VerticalLayout fields = new VerticalLayout(user, password, loginButton, registration);
 		fields.setCaption("Please login to access the application. (test@test.com/passw0rd)");
 		fields.setSpacing(true);
 		fields.setMargin(new MarginInfo(true, true, true, false));
@@ -67,11 +80,12 @@ Button.ClickListener {
 		// The view root layout
 		VerticalLayout viewLayout = new VerticalLayout();
 		
-		viewLayout.setSizeFull();
+		viewLayout.setSizeUndefined();
+		viewLayout.setWidth("100%");
 		viewLayout.addComponent(base);
 		viewLayout.addComponent(fields);
 		viewLayout.setComponentAlignment(fields, Alignment.TOP_CENTER);
-		viewLayout.setStyleName(Reindeer.LAYOUT_WHITE);
+		//viewLayout.setStyleName(Reindeer.LAYOUT_WHITE);
 		
 		setCompositionRoot(viewLayout);
 	}
@@ -88,6 +102,11 @@ Button.ClickListener {
 	private static final class PasswordValidator extends
 	AbstractValidator<String> {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		
 		public PasswordValidator() {
 			super("The password provided is not valid");
 		}
@@ -99,7 +118,7 @@ Button.ClickListener {
 			// one number
 			//
 			if (value != null
-					&& (value.length() < 8 || !value.matches(".*\\d.*"))) {
+					&& (value.length() < 4 || !value.matches(".*\\d.*"))) {
 				return false;
 			}
 			return true;
@@ -135,13 +154,14 @@ Button.ClickListener {
 
 		boolean isValid = false;
 		
-		
+		User u = new User();
 		try {
 			DAOFactory df = DAOFactory.getInstance();
 			UserDAO ud = df.getUserDAO();
-			User u;
+			
 			u = ud.getUserByUserName(username);
-			if(u.getPassword().equals(Hash.hashString(password))){
+			
+			if(Arrays.equals(Hash.hashString(password), u.getPassword())){
 				isValid = true;
 			}
 			
@@ -155,7 +175,7 @@ Button.ClickListener {
 		
 		if(isValid){
 			// Store the current user in the service session
-			getSession().setAttribute("user", username);
+			getSession().setAttribute("user", u);
 
 			// Navigate to main view
 			getUI().getNavigator().navigateTo(InitPage.NAME);

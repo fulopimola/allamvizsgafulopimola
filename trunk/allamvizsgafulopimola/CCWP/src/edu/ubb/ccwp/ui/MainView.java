@@ -4,15 +4,17 @@ import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 
 import edu.ubb.ccwp.model.User;
 
-public class MainView extends VerticalLayout implements View {
+public class MainView extends CustomComponent implements View {
     Panel panel;
     public static final String NAME = "main";
+    private VerticalLayout layout;
     
     // Menu navigation button listener
     class ButtonListener implements ClickListener {
@@ -29,11 +31,13 @@ public class MainView extends VerticalLayout implements View {
     }
 
     public MainView() {
+    	layout = new VerticalLayout();
+    	
         setSizeFull();
         User user = new User();
         user.setUserName("guest");
         BasePageUI base = new BasePageUI(user);
-		this.addComponent(base);
+		layout.addComponent(base);
         // Layout with menu on left and view area on right
         HorizontalLayout hLayout = new HorizontalLayout();
         hLayout.setSizeFull();
@@ -66,8 +70,8 @@ public class MainView extends VerticalLayout implements View {
         hLayout.addComponent(panel);
         hLayout.setExpandRatio(panel, 1.0f);
 
-        addComponent(hLayout);
-        setExpandRatio(hLayout, 1.0f);
+        layout.addComponent(hLayout);
+        layout.setExpandRatio(hLayout, 1.0f);
         
         // Allow going back to the start
         Button logout = new Button("Logout",
@@ -77,12 +81,16 @@ public class MainView extends VerticalLayout implements View {
             	getUI().getNavigator().navigateTo(InitPage.NAME);
             }
         });
-        addComponent(logout);
+        layout.addComponent(logout);
+        setCompositionRoot(layout);
     }        
     
     @Override
     public void enter(ViewChangeEvent event) {
         VerticalLayout panelContent = new VerticalLayout();
+        User u = (User) getSession().getAttribute("userr");
+    	
+        System.out.println(u.getUserName()+u.getAddress());
         panelContent.setSizeFull();
         panelContent.setMargin(true);
         panel.setContent(panelContent); // Also clears
