@@ -7,6 +7,8 @@ public class User {
 	private String phoneNumber;
 	private String email;
 	private String address;
+	private float latitude = 0;
+	private float longitude = 0;
 	
 	public int getUserID() {
 		return userID;
@@ -50,5 +52,17 @@ public class User {
 	}
 	public void setAddress(String address) {
 		this.address = address;
+	}
+	public float getLatitude() {
+		return latitude;
+	}
+	public void setLatitude(float latitude) {
+		this.latitude = latitude;
+	}
+	public float getLongitude() {
+		return longitude;
+	}
+	public void setLongitude(float longitude) {
+		this.longitude = longitude;
 	}
 }
