@@ -3,7 +3,7 @@ package edu.ubb.ccwp.ui;
 import java.util.Arrays;
 
 import com.vaadin.data.validator.AbstractValidator;
-import com.vaadin.data.validator.StringLengthValidator;
+import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.ui.MarginInfo;
@@ -29,7 +29,7 @@ Button.ClickListener {
 
 	public static final String NAME = "login";
 
-	private final TextField user;
+	private final TextField email;
 	private final PasswordField password;
 	private final Button loginButton;
 	private final Button registration;
@@ -42,15 +42,15 @@ Button.ClickListener {
 		u.setUserName("Guest");
 		BasePageUI base = new BasePageUI(u);
 		
-		user = new TextField("User:");
-		user.setWidth("300px");
-		user.setRequired(true);
-		user.setInputPrompt("Your username (eg. joe@email.com)");
-		//user.addValidator(new EmailValidator("Username must be an email address"));
-		user.addValidator(new StringLengthValidator(
+		email = new TextField("User:");
+		email.setWidth("300px");
+		email.setRequired(true);
+		email.setInputPrompt("Your username (eg. joe@email.com)");
+		email.addValidator(new EmailValidator("Username must be an email address"));
+		/*email.addValidator(new StringLengthValidator(
 			    "The name must be 1-10 letters (was {0})",
-			    1, 10, true));
-		//user.setInvalidAllowed(false);
+			    1, 10, true));*/
+		email.setInvalidAllowed(false);
 
 		// Create the password input field
 		password = new PasswordField("Password:");
@@ -71,7 +71,7 @@ Button.ClickListener {
         });
 		
 		// Add both to a panel
-		VerticalLayout fields = new VerticalLayout(user, password, loginButton, registration);
+		VerticalLayout fields = new VerticalLayout(email, password, loginButton, registration);
 		fields.setCaption("Please login to access the application. (test@test.com/passw0rd)");
 		fields.setSpacing(true);
 		fields.setMargin(new MarginInfo(true, true, true, false));
@@ -93,7 +93,7 @@ Button.ClickListener {
 	@Override
 	public void enter(ViewChangeEvent event) {
 		// focus the username field when user arrives to the login view
-		user.focus();
+		email.focus();
 	}
 
 	//
@@ -138,11 +138,11 @@ Button.ClickListener {
 		// fields we reduce the amount of queries we have to use to the database
 		// for wrongly entered passwords
 		//
-		if (!user.isValid() || !password.isValid()) {
+		if (!email.isValid() || !password.isValid()) {
 			return;
 		}
 
-		String username = user.getValue();
+		String email2 = email.getValue();
 		String password = this.password.getValue();
 
 		//
@@ -159,7 +159,7 @@ Button.ClickListener {
 			DAOFactory df = DAOFactory.getInstance();
 			UserDAO ud = df.getUserDAO();
 			
-			u = ud.getUserByUserName(username);
+			u = ud.getUserByEmail(email2);
 			
 			if(Arrays.equals(Hash.hashString(password), u.getPassword())){
 				isValid = true;

@@ -1,7 +1,5 @@
 package edu.ubb.ccwp.ui;
 
-import java.util.Arrays;
-
 import com.vaadin.data.validator.AbstractValidator;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.data.validator.StringLengthValidator;
@@ -11,6 +9,7 @@ import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -20,7 +19,6 @@ import edu.ubb.ccwp.dao.DAOFactory;
 import edu.ubb.ccwp.dao.UserDAO;
 import edu.ubb.ccwp.exception.DAOException;
 import edu.ubb.ccwp.exception.UserNameExistsException;
-import edu.ubb.ccwp.exception.UserNotFoundException;
 import edu.ubb.ccwp.logic.Hash;
 import edu.ubb.ccwp.model.User;
 
@@ -46,12 +44,20 @@ public class RegistrationView extends CustomComponent implements View, Button.Cl
 		u.setUserName("Guest");
 		BasePageUI base = new BasePageUI(u);
 
-		user = new TextField("User:");
+
+		email = new TextField("E-mail:");
+		email.setWidth("300px");
+		email.setRequired(true);
+		email.setInputPrompt("The emal must be contain a @ letter");
+		email.addValidator(new EmailValidator("The email must be an email address"));
+
+		user = new TextField("Name:");
 		user.setWidth("300px");
 		user.setRequired(true);
 		user.setInputPrompt("The name must be 1-10 letters");
-		user.addValidator(new UserNameValidator());
-
+		user.addValidator(new StringLengthValidator(
+			    "The name must be 5-30 letters (was {0})",
+			    5, 30, true));
 		// Create the password input field
 		password = new PasswordField("Password:");
 		password.setWidth("300px");
@@ -73,12 +79,6 @@ public class RegistrationView extends CustomComponent implements View, Button.Cl
 		phone.setInputPrompt("The phone must be 10 number");
 		phone.addValidator(new PhoneValidator());
 
-		email = new TextField("E-mail:");
-		email.setWidth("300px");
-		email.setRequired(true);
-		email.setInputPrompt("The emal must be contain a @ letter");
-		email.addValidator(new EmailValidator("The email must be an email address"));
-
 		address = new TextField("address:");
 		address.setWidth("300px");
 		address.setRequired(true);
@@ -91,8 +91,8 @@ public class RegistrationView extends CustomComponent implements View, Button.Cl
 		loginButton = new Button("Login", this);
 
 		// Add both to a panel
-		VerticalLayout fields = new VerticalLayout(user, password, passwordAgain, phone, email, address, loginButton);
-		fields.setCaption("Please login to access the application. (test@test.com/passw0rd)");
+		VerticalLayout fields = new VerticalLayout(email, user, password, passwordAgain, phone, address, loginButton);
+		
 		fields.setSpacing(true);
 		fields.setMargin(new MarginInfo(true, true, true, false));
 		fields.setSizeUndefined();
@@ -151,39 +151,6 @@ public class RegistrationView extends CustomComponent implements View, Button.Cl
 		}
 	}
 
-	private static final class UserNameValidator extends
-	AbstractValidator<String> {
-		public UserNameValidator() {
-			super("The username is not valid");
-		}
-
-		@Override
-		protected boolean isValidValue(String value) {
-
-			try {
-				DAOFactory df = DAOFactory.getInstance();
-				UserDAO ud = df.getUserDAO();
-				ud.getUserByUserName(value);
-				return false;
-			} catch (DAOException e) {
-				// TODO Auto-generated catch block
-				System.out.println("The database is stopped");
-				return false;
-
-			} catch (UserNotFoundException e) {
-				// TODO Auto-generated catch block
-				return true;
-			}
-
-		}
-
-		@Override
-		public Class<String> getType() {
-			// TODO Auto-generated method stub
-			return String.class;
-		}
-
-	}
 
 	private static final class PhoneValidator extends
 	AbstractValidator<String> {
@@ -229,9 +196,6 @@ public class RegistrationView extends CustomComponent implements View, Button.Cl
 		//
 		//boolean isValid = username.equals("test@test.com")
 		//		&& password.equals("passw0rd");
-
-		boolean isValid = false;
-
 		try {
 			User u = new User();
 			u.setUserName(username);
@@ -248,11 +212,17 @@ public class RegistrationView extends CustomComponent implements View, Button.Cl
 			// Navigate to main view
 			getUI().getNavigator().navigateTo(InitPage.NAME);
 		} catch (DAOException e) {
+			Notification.show("The Database Server not responding!");
+			System.out.println("Szerver hiba");
 			this.password.setValue(null);
+			RegistrationView.passwordAgain.setValue(null);
 			this.password.focus();
 		} catch (UserNameExistsException e) {
 			// Wrong password clear the password field and refocuses it
+			System.out.println("Az email mar letezik");
+			Notification.show("This e-mail address its alredy registered!");
 			this.password.setValue(null);
+			RegistrationView.passwordAgain.setValue(null);
 			this.password.focus();
 		}
 
