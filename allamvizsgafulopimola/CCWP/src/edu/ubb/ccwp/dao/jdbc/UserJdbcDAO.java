@@ -18,10 +18,10 @@ public class UserJdbcDAO implements UserDAO {
 	private User getUserFromResult(ResultSet result) throws SQLException {
 		User user = new User();
 		user.setUserID(result.getInt("UserID"));
+		user.setEmail(result.getString("Email"));
 		user.setUserName(result.getString("UserName"));
 		user.setPassword(result.getBytes("Password"));
 		user.setPhoneNumber(result.getString("PhoneNumber"));
-		user.setEmail(result.getString("Email"));
 		user.setAddress(result.getString("Address"));
 		user.setLatitude(result.getFloat("Latitude"));
 		user.setLongitude(result.getFloat("Longitude"));
@@ -48,13 +48,13 @@ public class UserJdbcDAO implements UserDAO {
 		return user;
 	}
 
-	public User getUserByUserName(String userName)throws DAOException, UserNotFoundException {
+	public User getUserByEmail(String email)throws DAOException, UserNotFoundException {
 		User user = new User();
 		try {
-			String command = "SELECT * FROM `users` WHERE `UserName` = ?";
+			String command = "SELECT * FROM `users` WHERE `Email` = ?";
 			PreparedStatement statement = JdbcConnection.getConnection()
 					.prepareStatement(command);
-			statement.setString(1, userName);
+			statement.setString(1, email);
 			ResultSet result = statement.executeQuery();
 			if (result.next()) {
 				user = getUserFromResult(result);
