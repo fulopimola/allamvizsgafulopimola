@@ -103,6 +103,7 @@ public class UserProfilePage extends CustomComponent implements View {
 	}
 	
 	private void setRead(boolean value){
+		
 		userName.setReadOnly(value);
 		email.setReadOnly(value);
 		phone.setReadOnly(value);
