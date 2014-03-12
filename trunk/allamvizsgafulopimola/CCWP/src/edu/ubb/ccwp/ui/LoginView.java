@@ -43,7 +43,7 @@ Button.ClickListener {
 		u.setUserName("Guest");
 		BasePageUI base = new BasePageUI(u);
 		
-		email = new TextField("User:");
+		email = new TextField("Email:");
 		email.setWidth("300px");
 		email.setRequired(true);
 		email.setInputPrompt("Your username (eg. joe@email.com)");

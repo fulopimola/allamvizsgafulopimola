@@ -1,5 +1,6 @@
 package edu.ubb.ccwp.ui;
 
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
@@ -68,6 +69,10 @@ public class BasePageUI  extends VerticalLayout{
 
 					getUI().getNavigator().navigateTo(InitPage.NAME);
 				}
+				if(selectedItem.getText().equals(user.getUserName()) && !user.getUserName().equals("Guest")){              	
+					getUI().getNavigator().navigateTo(UserProfilePage.NAME);
+
+				}
 				if (previous != null)
 					previous.setStyleName(null);
 				selectedItem.setStyleName("highlight");
@@ -83,5 +88,6 @@ public class BasePageUI  extends VerticalLayout{
 			barmenu.addItem("Logout",null, mycommand);
 		}
 		barmenu.addItem("Home", null, mycommand);
+		barmenu.setSizeFull();
 	}
 }

@@ -32,7 +32,7 @@ public class HomePage extends UI {
 		
 		navigator = new Navigator(this, this);
 		navigator.addView(InitPage.NAME, InitPage.class);
-		navigator.addView(MainView.NAME, MainView.class);
+		navigator.addView(UserProfilePage.NAME, UserProfilePage.class);
 		navigator.addView(LoginView.NAME, LoginView.class);
 		navigator.addView(RegistrationView.NAME, RegistrationView.class);
 	}

@@ -5,23 +5,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import org.apache.regexp.ReaderCharacterIterator;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.server.ExternalResource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
@@ -36,8 +28,6 @@ public class InitPage extends CustomComponent implements View {
 	public static final String NAME = "";
 	private VerticalLayout layout;
 	private VerticalLayout baseLayout;
-
-
 	private  User user;
 
 	public InitPage() {
@@ -53,11 +43,11 @@ public class InitPage extends CustomComponent implements View {
 		searchPanel.setHeight("100%");
 		searchPanel.setWidth(null);
 		VerticalLayout searchContent = new VerticalLayout();
-		searchContent.addComponent(new Button("Pig",
+		searchContent.addComponent(new Button("Erre lehet",
 				new ButtonListener("pig")));
-		searchContent.addComponent(new Button("Cat",
+		searchContent.addComponent(new Button("Hogy nem lesz",
 				new ButtonListener("cat")));
-		searchContent.addComponent(new Button("Dog",      
+		searchContent.addComponent(new Button("Szukseg",      
 				new ButtonListener("dog")));
 		searchContent.addComponent(new Button("Reindeer",
 				new ButtonListener("reindeer")));
@@ -77,14 +67,11 @@ public class InitPage extends CustomComponent implements View {
 		textPanel.setSizeFull();
 		textPanel.setHeight("100%");
 		VerticalLayout textContent = new VerticalLayout();
-		textContent.addComponent(new Label("Udv a honlapunkon"));
-		textContent.addComponent(new Label("Ide kell irni egy udvozlo uzenetet!"));
 
-		ExternalResource res=new ExternalResource("VAADIN/resources/resource.html"); 
 		try {
 			String basepath = VaadinService.getCurrent()
 					.getBaseDirectory().getAbsolutePath();
-			File file = new File(basepath + "/VAADIN/resources/resource.html");
+			File file = new File(basepath + "/VAADIN/resources/Home.html");
 			FileReader reader = new FileReader(file);
 			BufferedReader bf = new BufferedReader(reader);
 			String line = "";
@@ -126,29 +113,15 @@ public class InitPage extends CustomComponent implements View {
 
 	@Override
 	public void enter(ViewChangeEvent event) {
-		System.out.println("belepett az init enterbe");
 		user = (User) getSession().getAttribute("user");
 
 		baseLayout.addComponent(new BasePageUI(user));
 
 		setImmediate(true);
-		Button button = new Button("Go to Main View",
-				new Button.ClickListener() {
-			@Override
-			public void buttonClick(ClickEvent event) {
-				getUI().getNavigator().navigateTo(MainView.NAME);
-			}
-		});
-		//Label watching = new Label(
-		//        "You are currently watching a " +
-		//        event.getParameters());
-		//layout.addComponent(watching);
-
+		
 		Label footer = new Label("ide jar a lablec");
 
 		layout.addComponent(footer);
-		layout.addComponent(button);
-		layout.setComponentAlignment(button, Alignment.MIDDLE_CENTER);
 
 
 	}
