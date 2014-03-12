@@ -37,6 +37,7 @@ Button.ClickListener {
 	public LoginView() {
 		setSizeFull();
 
+		
 		// Create the user input field
 		User u = new User();
 		u.setUserName("Guest");
@@ -93,6 +94,7 @@ Button.ClickListener {
 	@Override
 	public void enter(ViewChangeEvent event) {
 		// focus the username field when user arrives to the login view
+		getSession().setAttribute("user", null);
 		email.focus();
 	}
 

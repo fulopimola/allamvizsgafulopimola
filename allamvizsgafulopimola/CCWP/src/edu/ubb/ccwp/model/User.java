@@ -3,7 +3,7 @@ package edu.ubb.ccwp.model;
 import java.io.Serializable;
 
 public class User implements Serializable {
-	private int userID;
+	private int userID = -1;
 	private String userName;
 	private byte[] password;
 	private String phoneNumber;

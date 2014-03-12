@@ -12,7 +12,7 @@ public class JdbcConnection {
 		String url = "jdbc:mysql://localhost:3306/";
 		String dbName = "ccwp";
 		String userName = "root";
-		String password = "";
+		String password = "root";
 
 		try {
 			
@@ -22,6 +22,7 @@ public class JdbcConnection {
 					password);
 		} catch (Exception e) {
 			connection = null;
+			System.out.println("nincs szerver");
 		}
 	}
 

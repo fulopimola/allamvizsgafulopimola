@@ -12,6 +12,7 @@ import com.vaadin.ui.UI;
 @SuppressWarnings("serial")
 public class HomePage extends UI {
 
+	
 	Navigator navigator;
 	protected static final String NAME = "init";
 
@@ -26,7 +27,7 @@ public class HomePage extends UI {
 	@Override
 	protected void init(VaadinRequest request) {
 		// TODO Auto-generated method stub
-
+		
 		getPage().setTitle("Valami");
 		
 		navigator = new Navigator(this, this);

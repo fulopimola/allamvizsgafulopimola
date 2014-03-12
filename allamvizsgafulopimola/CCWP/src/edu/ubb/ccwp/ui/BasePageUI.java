@@ -1,11 +1,7 @@
 package edu.ubb.ccwp.ui;
 
-import com.vaadin.navigator.Navigator;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
-import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.VerticalLayout;
 
@@ -19,8 +15,13 @@ public class BasePageUI  extends VerticalLayout{
 
 	public BasePageUI(User u) {
 		user = u;
+		if(user == null){
+			user = new User();
+			user.setUserName("Guest");
+		}
 
 		this.setImmediate(true);
+
 
 		if (manager) {
 			initManager();
@@ -34,25 +35,11 @@ public class BasePageUI  extends VerticalLayout{
 	protected void initManager() {
 		Label label = new Label("Ez az admin init");
 		addComponent(label);
-
 		initMenuBar();
 	}
-	
-	
+
+
 	protected void initUser() {
-		
-		if (user.getUserName().equals("Guest")){
-			Button loginButton = new Button("LogIn", new Button.ClickListener() {
-	            @Override
-	            public void buttonClick(ClickEvent event) {
-	            	getUI().getNavigator().navigateTo("login");
-	            }
-	        });
-			addComponent(loginButton);
-			setComponentAlignment(loginButton, Alignment.TOP_RIGHT);
-		}
-		
-		
 		initMenuBar();
 	}
 
@@ -70,19 +57,16 @@ public class BasePageUI  extends VerticalLayout{
 			MenuItem previous = null;
 
 			public void menuSelected(MenuItem selectedItem) {
-				selection.setValue("Ordered a /" +
-						selectedItem.getText() +
-						"/ from menu.");
 
 
+				if(selectedItem.getText().equals("Logout")){
 
-				if(selectedItem.getText().equals("InitPage")){              	
-					getUI().getNavigator().navigateTo("");
-					System.out.println("init page");
+					getSession().setAttribute("user", null);
+					getUI().getNavigator().navigateTo(LoginView.NAME);
 				}
-				if(selectedItem.getText().equals("MainView")){              	
-					getUI().getNavigator().navigateTo("main");
-					System.out.println("main view");
+				if(selectedItem.getText().equals("Login")){              	
+					getUI().getNavigator().navigateTo(LoginView.NAME);
+
 				}
 				if (previous != null)
 					previous.setStyleName(null);
@@ -92,9 +76,11 @@ public class BasePageUI  extends VerticalLayout{
 		};
 
 		// Put some items in the menu
-		barmenu.addItem("InitPage", null, mycommand);
-		barmenu.addItem("MainView", null, mycommand);
-		barmenu.addItem("Services", null, mycommand);
-
+		barmenu.addItem(user.getUserName(),  null, mycommand);
+		if(user.getUserID() == -1){
+			barmenu.addItem("Login", null, mycommand);
+		}else{
+			barmenu.addItem("Logout",null, mycommand);
+		}
 	}
 }
