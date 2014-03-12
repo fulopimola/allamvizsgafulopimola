@@ -28,7 +28,7 @@ public class HomePage extends UI {
 	protected void init(VaadinRequest request) {
 		// TODO Auto-generated method stub
 		
-		getPage().setTitle("Valami");
+		getPage().setTitle("CCWP");
 		
 		navigator = new Navigator(this, this);
 		navigator.addView(InitPage.NAME, InitPage.class);

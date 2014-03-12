@@ -47,11 +47,7 @@ public class BasePageUI  extends VerticalLayout{
 		MenuBar barmenu = new MenuBar();
 		barmenu.addStyleName("mybarmenu");
 		addComponent(barmenu);
-
-		// A feedback component
-		final Label selection = new Label("-");
-		addComponent(selection);
-
+		
 		// Define a common menu command for all the menu items
 		MenuBar.Command mycommand = new MenuBar.Command() {
 			MenuItem previous = null;
@@ -68,6 +64,10 @@ public class BasePageUI  extends VerticalLayout{
 					getUI().getNavigator().navigateTo(LoginView.NAME);
 
 				}
+				if(selectedItem.getText().equals("Home")){
+
+					getUI().getNavigator().navigateTo(InitPage.NAME);
+				}
 				if (previous != null)
 					previous.setStyleName(null);
 				selectedItem.setStyleName("highlight");
@@ -82,5 +82,6 @@ public class BasePageUI  extends VerticalLayout{
 		}else{
 			barmenu.addItem("Logout",null, mycommand);
 		}
+		barmenu.addItem("Home", null, mycommand);
 	}
 }
