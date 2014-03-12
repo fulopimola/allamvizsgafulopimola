@@ -88,7 +88,7 @@ public class MainView extends CustomComponent implements View {
     @Override
     public void enter(ViewChangeEvent event) {
         VerticalLayout panelContent = new VerticalLayout();
-        User u = (User) getSession().getAttribute("userr");
+        User u = (User) getSession().getAttribute("user");
     	
         System.out.println(u.getUserName()+u.getAddress());
         panelContent.setSizeFull();
