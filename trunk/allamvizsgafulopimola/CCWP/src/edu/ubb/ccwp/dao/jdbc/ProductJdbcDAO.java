@@ -13,33 +13,44 @@ import edu.ubb.ccwp.model.Product;
 public class ProductJdbcDAO implements ProductDAO {
 
 	@Override
-	public Product getProductByProductId(int userID) throws DAOException,
-	ProductNotFoundException {
-		// TODO Auto-generated method stub
-		return null;
+	public Product getProductByProductId(int productId) throws DAOException,
+	ProductNotFoundException, SQLException {
+		Product product = new Product();
+
+		String command = "SELECT * FROM `Products` WHERE `ProductId` = ?";
+		PreparedStatement statement;
+
+		statement = JdbcConnection.getConnection()
+				.prepareStatement(command);
+		statement.setInt(1, productId);
+
+		ResultSet result = statement.executeQuery();
+
+		if(result.next()){
+			product = getProductFromResult(result);
+		}else{
+			throw new ProductNotFoundException();
+		}
+		return product;
 	}
 
 	@Override
-	public ArrayList<Product> getAllProduct() throws DAOException {
+	public ArrayList<Product> getAllProduct() throws DAOException, SQLException {
 
 		ArrayList<Product> products = new ArrayList<Product>();
 
-		try {
-			String command = "SELECT * FROM `Products`";
-			PreparedStatement statement = JdbcConnection.getConnection()
-					.prepareStatement(command);
-			
-			ResultSet result = statement.executeQuery();
-			
-			while (result.next()) {
-				Product product = new Product();
-				product = getProductFromResult(result);
-				products.add(product);
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		String command = "SELECT * FROM `Products`";
+		PreparedStatement statement = JdbcConnection.getConnection()
+				.prepareStatement(command);
+
+		ResultSet result = statement.executeQuery();
+
+		while (result.next()) {
+			Product product = new Product();
+			product = getProductFromResult(result);
+			products.add(product);
 		}
+
 		return products;
 	}
 
@@ -56,28 +67,47 @@ public class ProductJdbcDAO implements ProductDAO {
 
 	@Override
 	public ArrayList<Product> getProductSearch(String likeName)
-			throws DAOException {
+			throws DAOException, SQLException {
 		// TODO Auto-generated method stub
 		ArrayList<Product> products = new ArrayList<Product>();
 
-		try {
-			String command = "SELECT * FROM `Products` WHERE `ProductName` LIKE ?";
-			PreparedStatement statement = JdbcConnection.getConnection()
-					.prepareStatement(command);
-			statement.setString(1, "%"+likeName+"%");
-			
-			ResultSet result = statement.executeQuery();
-			
-			while (result.next()) {
-				Product product = new Product();
-				product = getProductFromResult(result);
-				products.add(product);
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
+		String command = "SELECT * FROM `Products` WHERE `ProductName` LIKE ?";
+		PreparedStatement statement = JdbcConnection.getConnection()
+				.prepareStatement(command);
+		statement.setString(1, "%"+likeName+"%");
+
+		ResultSet result = statement.executeQuery();
+
+		while (result.next()) {
+			Product product = new Product();
+			product = getProductFromResult(result);
+			products.add(product);
 		}
+
 		return products;
+	}
+
+	@Override
+	public Product getProductByProductname(String str) throws DAOException, SQLException, ProductNotFoundException {
+		Product product = new Product();
+
+		String command = "SELECT * FROM `Products` WHERE `ProductName` = ?";
+		PreparedStatement statement;
+
+		statement = JdbcConnection.getConnection()
+				.prepareStatement(command);
+		statement.setString(1, str);
+
+		ResultSet result = statement.executeQuery();
+
+		if(result.next()){
+			product = getProductFromResult(result);
+		}
+		else{
+			throw new ProductNotFoundException();
+		}
+		return product;
 	}
 
 }
