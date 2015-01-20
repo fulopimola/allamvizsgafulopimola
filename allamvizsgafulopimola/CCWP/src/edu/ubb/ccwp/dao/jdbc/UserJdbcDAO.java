@@ -29,9 +29,9 @@ public class UserJdbcDAO implements UserDAO {
 	}
 
 	public User getUserByUserID(int userID) throws DAOException,
-	UserNotFoundException {
+	UserNotFoundException, SQLException {
 		User user = new User();
-		try {
+		
 			String command = "SELECT * FROM `users` WHERE `UserID` = ?";
 			PreparedStatement statement = JdbcConnection.getConnection()
 					.prepareStatement(command);
@@ -42,15 +42,13 @@ public class UserJdbcDAO implements UserDAO {
 			} else {
 				throw new UserNotFoundException();
 			}
-		} catch (SQLException e) {
-			throw new DAOException();
-		}
+	
 		return user;
 	}
 
-	public User getUserByEmail(String email)throws DAOException, UserNotFoundException {
+	public User getUserByEmail(String email)throws DAOException, UserNotFoundException, SQLException {
 		User user = new User();
-		try {
+		
 			String command = "SELECT * FROM `users` WHERE `Email` = ?";
 			PreparedStatement statement = JdbcConnection.getConnection()
 					.prepareStatement(command);
@@ -61,16 +59,14 @@ public class UserJdbcDAO implements UserDAO {
 			} else {
 				throw new UserNotFoundException();
 			}
-		} catch (SQLException e) {
-			throw new DAOException();
-		}
+		
 		return user;
 	}
 
 	@Override
-	public User insertUser(User user) throws DAOException, UserNameExistsException
+	public User insertUser(User user) throws DAOException, UserNameExistsException, SQLException
 	{
-		try {
+		
 			String command = "INSERT INTO `users`(`UserName`, `Password`, `PhoneNumber`, `Email`, `Address`, `Latitude`, `Longitude`) VALUES (?, ?, ?, ?, ?, ?, ?);";
 			PreparedStatement statement = JdbcConnection.getConnection()
 					.prepareStatement(command, Statement.RETURN_GENERATED_KEYS);
@@ -85,9 +81,7 @@ public class UserJdbcDAO implements UserDAO {
 			ResultSet result = statement.getGeneratedKeys();
 			result.next();
 			user.setUserID(result.getInt(1));
-		} catch (SQLException e) {
-			throw new UserNameExistsException();
-		}
+		
 		return user;
 	}
 }

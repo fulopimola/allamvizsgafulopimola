@@ -1,5 +1,6 @@
 package edu.ubb.ccwp.ui;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 
 import com.vaadin.data.validator.AbstractValidator;
@@ -11,6 +12,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -170,9 +172,15 @@ Button.ClickListener {
 		} catch (DAOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			Notification.show("Error",Notification.Type.WARNING_MESSAGE);
 		} catch (UserNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			Notification.show("Error",Notification.Type.WARNING_MESSAGE);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			Notification.show("Error",Notification.Type.WARNING_MESSAGE);
 		}
 		
 		if(isValid){

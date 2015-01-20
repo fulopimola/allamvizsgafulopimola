@@ -1,5 +1,7 @@
 package edu.ubb.ccwp.ui;
 
+import java.sql.SQLException;
+
 import com.vaadin.data.validator.AbstractValidator;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.data.validator.StringLengthValidator;
@@ -224,6 +226,10 @@ public class RegistrationView extends CustomComponent implements View, Button.Cl
 			this.password.setValue(null);
 			RegistrationView.passwordAgain.setValue(null);
 			this.password.focus();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			Notification.show("Error");
 		}
 
 	}
