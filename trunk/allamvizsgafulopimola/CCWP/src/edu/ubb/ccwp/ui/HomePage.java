@@ -35,6 +35,7 @@ public class HomePage extends UI {
 		navigator.addView(UserProfilePage.NAME, UserProfilePage.class);
 		navigator.addView(LoginView.NAME, LoginView.class);
 		navigator.addView(RegistrationView.NAME, RegistrationView.class);
+		navigator.addView(SearchPage.NAME, SearchPage.class);
 	}
 
 

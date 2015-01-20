@@ -12,7 +12,7 @@ public class JdbcConnection {
 		String url = "jdbc:mysql://localhost:3306/";
 		String dbName = "ccwp";
 		String userName = "root";
-		String password = "root";
+		String password = "";
 
 		try {
 			

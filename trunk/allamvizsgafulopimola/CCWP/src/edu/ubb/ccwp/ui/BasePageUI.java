@@ -69,6 +69,10 @@ public class BasePageUI  extends VerticalLayout{
 
 					getUI().getNavigator().navigateTo(InitPage.NAME);
 				}
+				if(selectedItem.getText().equals("Search")){
+
+					getUI().getNavigator().navigateTo(SearchPage.NAME);
+				}
 				if(selectedItem.getText().equals(user.getUserName()) && !user.getUserName().equals("Guest")){              	
 					getUI().getNavigator().navigateTo(UserProfilePage.NAME);
 
@@ -88,6 +92,7 @@ public class BasePageUI  extends VerticalLayout{
 			barmenu.addItem("Logout",null, mycommand);
 		}
 		barmenu.addItem("Home", null, mycommand);
+		barmenu.addItem("Search",null, mycommand);
 		barmenu.setSizeFull();
 	}
 }

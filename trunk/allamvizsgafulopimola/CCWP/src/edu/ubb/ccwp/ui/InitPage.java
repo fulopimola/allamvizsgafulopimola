@@ -8,12 +8,15 @@ import java.io.IOException;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
@@ -29,45 +32,48 @@ public class InitPage extends CustomComponent implements View {
 	private VerticalLayout layout;
 	private VerticalLayout baseLayout;
 	private  User user;
+	private HorizontalLayout hLayout = new HorizontalLayout();
+
+
 
 	public InitPage() {
 		layout = new VerticalLayout();
 		layout.setSizeFull();
 		baseLayout = new VerticalLayout();
 		layout.addComponent(baseLayout);
+		hLayout.setSizeFull();
+		hLayout.setHeight("100%");
+		hLayout.setWidth("100%");
 
-		HorizontalLayout hLayout = new HorizontalLayout();
-		// Have a menu on the left side of the screen
-		//Panel menu = new Panel("List of Equals");
-		Panel searchPanel = new Panel();
-		searchPanel.setHeight("100%");
-		searchPanel.setWidth(null);
-		VerticalLayout searchContent = new VerticalLayout();
-		searchContent.addComponent(new Button("Erre lehet",
-				new ButtonListener("pig")));
-		searchContent.addComponent(new Button("Hogy nem lesz",
-				new ButtonListener("cat")));
-		searchContent.addComponent(new Button("Szukseg",      
-				new ButtonListener("dog")));
-		searchContent.addComponent(new Button("Reindeer",
-				new ButtonListener("reindeer")));
-		searchContent.addComponent(new Button("Penguin",
-				new ButtonListener("penguin")));
-		searchContent.addComponent(new Button("Sheep",
-				new ButtonListener("sheep")));
-		searchContent.setWidth(null);
-		searchContent.setMargin(true);
-		searchPanel.setContent(searchContent);
-		hLayout.addComponent(searchPanel);
+		layout.addComponent(hLayout);
+		layout.setExpandRatio(hLayout, 1.0f);
+		setCompositionRoot(layout);
+		
+		menuLoad();
+		
+	}        
 
+	@Override
+	public void enter(ViewChangeEvent event) {
+		user = (User) getSession().getAttribute("user");
 
-		// A panel that contains a content area on right
-		//Panel panel = new Panel("An Equal");
+		baseLayout.addComponent(new BasePageUI(user));
+
+		setImmediate(true);
+
+		Label footer = new Label("ide jar a lablec");
+
+		layout.addComponent(footer);
+
 		Panel textPanel = new Panel();
 		textPanel.setSizeFull();
 		textPanel.setHeight("100%");
 		VerticalLayout textContent = new VerticalLayout();
 
+		textContent.setHeight("100%");
+		textContent.setWidth("100%");
+		textContent.setMargin(true);
+		textPanel.setContent(textContent);
 		try {
 			String basepath = VaadinService.getCurrent()
 					.getBaseDirectory().getAbsolutePath();
@@ -95,33 +101,47 @@ public class InitPage extends CustomComponent implements View {
 			e.printStackTrace();
 		}
 
-		textContent.setHeight("100%");
-		textContent.setWidth("100%");
-		textContent.setMargin(true);
-		textPanel.setContent(textContent);
 
-		hLayout.setSizeFull();
-		hLayout.setHeight("100%");
-		hLayout.setWidth("100%");
 		hLayout.addComponent(textPanel);
 		hLayout.setExpandRatio(textPanel, 1.0f);
 
-		layout.addComponent(hLayout);
-		layout.setExpandRatio(hLayout, 1.0f);
-		setCompositionRoot(layout);
-	}        
+		VerticalLayout panelContent = new VerticalLayout();
+		panelContent.setSizeFull();
+		panelContent.setMargin(true);
+		layout.addComponent(panelContent); // Also clears
 
-	@Override
-	public void enter(ViewChangeEvent event) {
-		user = (User) getSession().getAttribute("user");
 
-		baseLayout.addComponent(new BasePageUI(user));
+		if (event.getParameters() == null
+				|| event.getParameters().isEmpty()) {
+			panelContent.addComponent(
+					new Label("Nothing to see here, " +
+							"just pass along."));
 
-		setImmediate(true);
-		
-		Label footer = new Label("ide jar a lablec");
+		}else{
 
-		layout.addComponent(footer);
+			// Display the fragment parameters
+			String parameter = event.getParameters();
+			Label watching = new Label(
+					"You are currently watching a " +
+							parameter);
+			watching.setSizeUndefined();
+			panelContent.addComponent(watching);
+			panelContent.setComponentAlignment(watching,
+					Alignment.MIDDLE_CENTER);
+
+			Label back = new Label("And the " +
+					parameter + " is watching you");
+			back.setSizeUndefined();
+			panelContent.addComponent(back);
+			panelContent.setComponentAlignment(back,
+					Alignment.MIDDLE_CENTER);
+
+			//System.out.println(event.getParameters());
+			if (parameter.equals("search")){
+				searchLoad();
+			}
+			
+		}
 
 
 	}
@@ -135,8 +155,53 @@ public class InitPage extends CustomComponent implements View {
 
 		public void buttonClick(ClickEvent event) {
 			// Navigate to a specific state
-			getUI().getNavigator().navigateTo(InitPage.NAME+"/" + menuitem);
+			if( menuitem.equals("search")){
+				getUI().getNavigator().navigateTo(InitPage.NAME+"/" + menuitem);
+			}else{
+				getUI().getNavigator().navigateTo(InitPage.NAME+"/" + menuitem);
+			}
 		}
+	}
+
+
+	private void menuLoad(){
+
+		Panel verticalMenuPanel = new Panel();
+		verticalMenuPanel.setHeight("100%");
+		verticalMenuPanel.setWidth(null);
+		VerticalLayout verticalMenuContent = new VerticalLayout();
+		verticalMenuContent.addComponent(new Button("Erre lehet",
+				new ButtonListener("pig")));
+		verticalMenuContent.addComponent(new Button("Hogy nem lesz",
+				new ButtonListener("cat")));
+		verticalMenuContent.addComponent(new Button("Szukseg",      
+				new ButtonListener("dog")));
+		verticalMenuContent.addComponent(new Button("Reindeer",
+				new ButtonListener("reindeer")));
+		verticalMenuContent.addComponent(new Button("Penguin",
+				new ButtonListener("penguin")));
+		verticalMenuContent.addComponent(new Button("search",
+				new ButtonListener("search")));
+		verticalMenuContent.setWidth(null);
+		verticalMenuContent.setMargin(true);
+		verticalMenuPanel.setContent(verticalMenuContent);
+		hLayout.addComponent(verticalMenuPanel);
+
+
+	}
+
+	private void searchLoad(){
+
+		Panel searchMenuPanel = new Panel();
+		searchMenuPanel.setHeight("100%");
+		searchMenuPanel.setWidth(null);
+		VerticalLayout searchMenuContent = new VerticalLayout();
+		searchMenuContent.addComponent(new Button("search",
+				new ButtonListener("search")));
+		searchMenuContent.setWidth(null);
+		searchMenuContent.setMargin(true);
+		searchMenuPanel.setContent(searchMenuContent);
+		hLayout.addComponent(searchMenuPanel);
 	}
 }
 
