@@ -16,7 +16,7 @@ public class Product implements Serializable {
 	private double productRate;
 	private int companyId;
 	private int categoryId;
-	
+	private double[][] productInShops = new double[255][255];
 	
 	public int getProductId() {
 		return productId;
@@ -60,5 +60,11 @@ public class Product implements Serializable {
 		return "Product [productID = " + productId + ", productName = " + productName
 				+ " productDescription = " + productDescription + ", productRate = " + productRate
 				+" categoryId = "+ categoryId +" companyId= "+companyId+"]";
+	}
+	public double[][] getProductInShops() {
+		return productInShops;
+	}
+	public void setProductInShops(double[][] productInShops) {
+		this.productInShops = productInShops;
 	}
 }
