@@ -23,6 +23,7 @@ import com.vaadin.ui.Button.ClickListener;
 import edu.ubb.ccwp.dao.DAOFactory;
 import edu.ubb.ccwp.dao.ProductDAO;
 import edu.ubb.ccwp.exception.DAOException;
+import edu.ubb.ccwp.exception.NotInShopException;
 import edu.ubb.ccwp.exception.ProductNotFoundException;
 import edu.ubb.ccwp.model.Product;
 import edu.ubb.ccwp.model.User;
@@ -114,6 +115,9 @@ public class SearchPage extends CustomComponent implements View {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 					Notification.show("Not found");
+				} catch (NotInShopException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
 		});
@@ -147,6 +151,9 @@ public class SearchPage extends CustomComponent implements View {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			Notification.show("Error");
+		} catch (NotInShopException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		int i = 0;
