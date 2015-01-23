@@ -13,7 +13,7 @@ public interface ProductDAO {
 	
 	Product getProductByProductId(int productID) throws DAOException, ProductNotFoundException, SQLException, NotInShopException;
 	ArrayList<Product> getAllProduct() throws DAOException, SQLException, NotInShopException;
-	ArrayList<Product> getProductSearch(String likeName, int shopId) throws DAOException, SQLException,  NotInShopException;
+	ArrayList<Product> getProductSearch(String likeName, int shopId, int compId, int catId) throws DAOException, SQLException,  NotInShopException;
 	Product getProductByProductname(String str) throws DAOException, SQLException, ProductNotFoundException, NotInShopException;
 	double[][] getproductInShopPrice(int productId) throws SQLException, DAOException,  NotInShopException;
 }
