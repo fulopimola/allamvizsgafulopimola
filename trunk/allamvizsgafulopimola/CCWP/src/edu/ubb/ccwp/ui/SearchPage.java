@@ -3,7 +3,6 @@ package edu.ubb.ccwp.ui;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-
 import com.vaadin.annotations.Theme;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -20,6 +19,7 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -29,6 +29,7 @@ import edu.ubb.ccwp.dao.ProductDAO;
 import edu.ubb.ccwp.exception.DAOException;
 import edu.ubb.ccwp.exception.NotInShopException;
 import edu.ubb.ccwp.exception.ProductNotFoundException;
+import edu.ubb.ccwp.model.Company;
 import edu.ubb.ccwp.model.Product;
 import edu.ubb.ccwp.model.Shop;
 import edu.ubb.ccwp.model.User;
@@ -45,7 +46,9 @@ public class SearchPage extends CustomComponent implements View {
 	private VerticalLayout textContent;
 	private User user;
 	private Table table;
-	private ComboBox select;
+	private ComboBox shopSelect;
+	private ComboBox compSelect;
+	private TreeTable catTree;
 
 
 	private TextField searchText;
@@ -94,6 +97,7 @@ public class SearchPage extends CustomComponent implements View {
 		table = new Table("All Product!");
 		table.setSelectable(true);
 		table.setImmediate(true);
+		
 		//table.setHeight("600px");
 		//table.setWidth("400px");
 		loadProduct();
@@ -147,17 +151,17 @@ public class SearchPage extends CustomComponent implements View {
 		table.addContainerProperty("Rate",  Double.class, null);
 		table.addContainerProperty("Price(avg)",  String.class, null);
 		table.setColumnWidth("Description", 80);
-		table.addStyleName("big striped");
-
-	
-
-
+		
 		try {
 			DAOFactory df = DAOFactory.getInstance();
 			ProductDAO prod = df.getProductDAO();
 			int shopId = -1;
-			if(select.getValue() != null) shopId = Integer.parseInt(select.getValue().toString());
-			products = prod.getProductSearch(searchText.getValue(), shopId);
+			if(shopSelect.getValue() != null) shopId = ((Shop)shopSelect.getValue()).getShopId();
+			int compId = -1;
+			if(compSelect.getValue() != null) compId = ((Company)compSelect.getValue()).getCompanyId();
+			int catId = -1;
+			if(catTree.getValue() != null) catId = Integer.parseInt(catTree.getValue().toString());
+			products = prod.getProductSearch(searchText.getValue(), shopId, compId, catId);
 
 
 		} catch (DAOException e) {
@@ -177,15 +181,14 @@ public class SearchPage extends CustomComponent implements View {
 		for (Product product : products) {
 			//System.out.println(product);
 			String price = "";
-			if(select.getValue() != null){
-				price =String.format("%1$,.2f",getPriceShopId(product, Integer.parseInt(select.getValue().toString()))) + " lej";
+			if(shopSelect.getValue() != null){
+				Shop shop = (Shop) shopSelect.getValue();
+				price =String.format("%1$,.2f",getPriceShopId(product, shop.getShopId())) + " lej";
 			}else{
 				price = String.format("%1$,.2f",getAvgPrice(product))+ " lej"; 
 			}
 			table.addItem(new Object[] {product.getProductId(), product.getProductName(), product.getProductDescription(),product.getProductRate(), price}, i);
 			i++;
-
-
 			table.setItemDescriptionGenerator(new ItemDescriptionGenerator() {                             
 				public String generateDescription(Component source, Object itemId, Object propertyId) {
 					if(propertyId == null){
@@ -196,11 +199,6 @@ public class SearchPage extends CustomComponent implements View {
 					return null;
 				}
 			});
-			
-			
-			
-
-
 		}
 	}
 	private double getAvgPrice(Product product) {
@@ -239,14 +237,14 @@ public class SearchPage extends CustomComponent implements View {
 		searchMenuContent.addComponent(counter);
 
 
-		select = new ComboBox("Select a shop");
+		shopSelect = new ComboBox("Select a shop");
 		try {
 			ArrayList<Shop> shops = DAOFactory.getInstance().getShopsDAO().getAllShop();
 
 			for (Shop shop : shops) {
 
-				select.addItem(shop.getShopId());
-				select.setItemCaption(shop.getShopId(), shop.getShopName());
+				shopSelect.addItem(shop);
+				shopSelect.setItemCaption(shop, shop.getShopName());
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -256,13 +254,44 @@ public class SearchPage extends CustomComponent implements View {
 			e.printStackTrace();
 		}
 
+		compSelect = new ComboBox("Select a company");
 
-		searchMenuContent.addComponent(select);
+		try {
+			ArrayList<Company> companys = DAOFactory.getInstance().getCompanyDAO().getAllCompany();
+			for (Company company : companys) {
+				compSelect.addItem(company);
+				compSelect.setItemCaption(company, company.getCompanyName());
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DAOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
+		try {
+			catTree = DAOFactory.getInstance().getCategoryDAO().getAllCategoryTree();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DAOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catTree.setSelectable(true);
+
+		catTree.setHeight("160px");
+
+		searchMenuContent.addComponent(shopSelect);
+		searchMenuContent.addComponent(compSelect);
+		searchMenuContent.addComponent(catTree);
 
 
 		searchMenuContent.addComponent(new Button("search",
 				new ButtonListener("search")));
+
 
 		searchMenuContent.setWidth(null);
 		searchMenuContent.setMargin(true);

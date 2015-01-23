@@ -72,20 +72,26 @@ public class ProductJdbcDAO implements ProductDAO {
 	}
 
 	@Override
-	public ArrayList<Product> getProductSearch(String likeName, int shopId)
+	public ArrayList<Product> getProductSearch(String likeName, int shopId, int compId, int catId)
 			throws DAOException, SQLException, NotInShopException {
 		// TODO Auto-generated method stub
 		ArrayList<Product> products = new ArrayList<Product>();
 		ArrayList<Product> newproducts = new ArrayList<Product>();
-
+		System.out.println(catId);
 		String command = "SELECT * FROM `Products` WHERE `ProductName` LIKE ?";
 
-
+		if (compId != -1){
+			command += "AND `Companys_CompId` = "+compId;
+		}
+		
+		if (catId != -1){
+			command += "AND `Categories_CategoryId` = "+catId;
+		}
 
 		PreparedStatement statement = JdbcConnection.getConnection()
 				.prepareStatement(command);
 		statement.setString(1, "%"+likeName+"%");
-
+		
 		ResultSet result = statement.executeQuery();
 
 		while (result.next()) {
@@ -95,7 +101,7 @@ public class ProductJdbcDAO implements ProductDAO {
 		}
 
 		if(shopId>0){
-			System.out.println(shopId);
+			//System.out.println(shopId);
 			for (Product product : products) {
 				double[][] shopid = product.getProductInShops();
 				for(int i = 1; i<=shopid[0][1];i++){
