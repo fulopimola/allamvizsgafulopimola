@@ -11,4 +11,5 @@ public interface ShopDAO {
 	
 	Shop getShopByShopId(int id) throws SQLException, DAOException, ShopNotFoundException;
 	ArrayList<Shop> getShopsByProductId(int id) throws SQLException, DAOException, ShopNotFoundException;
+	ArrayList<Shop> getAllShop() throws SQLException, DAOException;
 }

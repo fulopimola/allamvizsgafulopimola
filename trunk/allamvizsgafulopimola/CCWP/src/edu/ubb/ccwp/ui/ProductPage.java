@@ -88,7 +88,7 @@ public class ProductPage extends CustomComponent implements View{
 				//System.out.println((int)price[i][1]+" "+(int)price[i][2]+" "+price[i][3]);
 				Shop shop = DAOFactory.getInstance().getShopsDAO().getShopByShopId((int)price[i][1]);
 
-				shopsLabel.setValue(shopsLabel.getValue()+",<br>"+ shop.getShopName() + " price = " +price[i][3]);
+				shopsLabel.setValue(shopsLabel.getValue()+"<br>"+ shop.getShopName() + " price = " +price[i][3]+" lej");
 			}
 			textContent.addComponent(shopsLabel);
 		} catch (SQLException e) {

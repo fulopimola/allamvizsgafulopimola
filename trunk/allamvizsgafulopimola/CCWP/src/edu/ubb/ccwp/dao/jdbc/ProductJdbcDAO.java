@@ -72,13 +72,16 @@ public class ProductJdbcDAO implements ProductDAO {
 	}
 
 	@Override
-	public ArrayList<Product> getProductSearch(String likeName)
+	public ArrayList<Product> getProductSearch(String likeName, int shopId)
 			throws DAOException, SQLException, NotInShopException {
 		// TODO Auto-generated method stub
 		ArrayList<Product> products = new ArrayList<Product>();
-
+		ArrayList<Product> newproducts = new ArrayList<Product>();
 
 		String command = "SELECT * FROM `Products` WHERE `ProductName` LIKE ?";
+
+
+
 		PreparedStatement statement = JdbcConnection.getConnection()
 				.prepareStatement(command);
 		statement.setString(1, "%"+likeName+"%");
@@ -91,7 +94,22 @@ public class ProductJdbcDAO implements ProductDAO {
 			products.add(product);
 		}
 
-		return products;
+		if(shopId>0){
+			System.out.println(shopId);
+			for (Product product : products) {
+				double[][] shopid = product.getProductInShops();
+				for(int i = 1; i<=shopid[0][1];i++){
+					if(shopId ==shopid[i][1]){
+						newproducts.add(product);
+					}
+				}
+			}
+		}
+		else{
+			newproducts = products;
+		}
+
+		return newproducts;
 	}
 
 	@Override
@@ -135,7 +153,7 @@ public class ProductJdbcDAO implements ProductDAO {
 			matrix[i][2] = res.getInt("Products_ProductId");
 			matrix[i][3] = res.getDouble("Price");
 			//System.out.println("matrix "+matrix[i][1] + " " + matrix[i][2] + " "+ matrix[i][3]);
-			
+
 		}
 		matrix[0][1] = i;
 		if (i==0){

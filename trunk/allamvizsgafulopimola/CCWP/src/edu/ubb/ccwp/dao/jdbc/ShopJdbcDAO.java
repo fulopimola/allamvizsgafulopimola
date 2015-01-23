@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import java_cup.shift_action;
 import edu.ubb.ccwp.dao.ShopDAO;
 import edu.ubb.ccwp.exception.DAOException;
 import edu.ubb.ccwp.exception.ShopNotFoundException;
@@ -66,6 +67,22 @@ public class ShopJdbcDAO implements ShopDAO {
 			throw new ShopNotFoundException();
 		}
 
+		return shops;
+	}
+
+	@Override
+	public ArrayList<Shop> getAllShop() throws SQLException, DAOException {
+		// TODO Auto-generated method stub
+		
+		ArrayList<Shop> shops = new ArrayList<Shop>();
+
+		String command = "SELECT * FROM `shops`";
+		PreparedStatement statement = JdbcConnection.getConnection()
+				.prepareStatement(command);
+		ResultSet result = statement.executeQuery();
+		while (result.next()) {
+			shops.add(getShopFromResult(result));
+		}
 		return shops;
 	}
 

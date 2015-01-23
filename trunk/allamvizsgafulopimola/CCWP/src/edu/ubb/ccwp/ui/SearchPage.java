@@ -4,11 +4,15 @@ package edu.ubb.ccwp.ui;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import com.vaadin.annotations.Theme;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.ui.AbstractSelect.ItemDescriptionGenerator;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -26,10 +30,12 @@ import edu.ubb.ccwp.exception.DAOException;
 import edu.ubb.ccwp.exception.NotInShopException;
 import edu.ubb.ccwp.exception.ProductNotFoundException;
 import edu.ubb.ccwp.model.Product;
+import edu.ubb.ccwp.model.Shop;
 import edu.ubb.ccwp.model.User;
 
 
 @SuppressWarnings("serial")
+@Theme("styles")
 public class SearchPage extends CustomComponent implements View {
 
 	public static final String NAME = "searchPage";
@@ -39,6 +45,7 @@ public class SearchPage extends CustomComponent implements View {
 	private VerticalLayout textContent;
 	private User user;
 	private Table table;
+	private ComboBox select;
 
 
 	private TextField searchText;
@@ -61,7 +68,7 @@ public class SearchPage extends CustomComponent implements View {
 		layout.addComponent(hLayout);
 		layout.setExpandRatio(hLayout, 1.0f);
 		setCompositionRoot(layout);
-		
+
 	}
 
 	@Override
@@ -76,7 +83,7 @@ public class SearchPage extends CustomComponent implements View {
 		textPanel.setSizeFull();
 		textPanel.setHeight("100%");
 
-		
+
 		textPanel.setContent(textContent);
 
 		searchField();
@@ -87,8 +94,8 @@ public class SearchPage extends CustomComponent implements View {
 		table = new Table("All Product!");
 		table.setSelectable(true);
 		table.setImmediate(true);
-		table.setHeight("600px");
-		table.setWidth("400px");
+		//table.setHeight("600px");
+		//table.setWidth("400px");
 		loadProduct();
 
 		//select a product in table -> new page
@@ -99,7 +106,7 @@ public class SearchPage extends CustomComponent implements View {
 					ProductDAO pd = df.getProductDAO();
 
 					Product prod = pd.getProductByProductId((Integer) table.getItem(table.getValue()).getItemProperty("Id").getValue());
-				
+
 					//System.out.println(prod);
 					getSession().setAttribute("product",prod);
 					getUI().getNavigator().navigateTo(ProductPage.NAME);
@@ -138,11 +145,21 @@ public class SearchPage extends CustomComponent implements View {
 		table.addContainerProperty("Name", String.class, null);
 		table.addContainerProperty("Description",  String.class, null);
 		table.addContainerProperty("Rate",  Double.class, null);
+		table.addContainerProperty("Price(avg)",  String.class, null);
+		table.setColumnWidth("Description", 80);
+		table.addStyleName("big striped");
+
+	
+
 
 		try {
 			DAOFactory df = DAOFactory.getInstance();
 			ProductDAO prod = df.getProductDAO();
-			products = prod.getProductSearch(searchText.getValue());
+			int shopId = -1;
+			if(select.getValue() != null) shopId = Integer.parseInt(select.getValue().toString());
+			products = prod.getProductSearch(searchText.getValue(), shopId);
+
+
 		} catch (DAOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -159,12 +176,51 @@ public class SearchPage extends CustomComponent implements View {
 		int i = 0;
 		for (Product product : products) {
 			//System.out.println(product);
-			table.addItem(new Object[] {product.getProductId(), product.getProductName(), product.getProductDescription(),product.getProductRate()}, i);
+			String price = "";
+			if(select.getValue() != null){
+				price =String.format("%1$,.2f",getPriceShopId(product, Integer.parseInt(select.getValue().toString()))) + " lej";
+			}else{
+				price = String.format("%1$,.2f",getAvgPrice(product))+ " lej"; 
+			}
+			table.addItem(new Object[] {product.getProductId(), product.getProductName(), product.getProductDescription(),product.getProductRate(), price}, i);
 			i++;
+
+
+			table.setItemDescriptionGenerator(new ItemDescriptionGenerator() {                             
+				public String generateDescription(Component source, Object itemId, Object propertyId) {
+					if(propertyId == null){
+						return "Row description "+ itemId;
+					} else if(propertyId == "Description") {
+						return table.getItem(itemId).getItemProperty(propertyId).getValue()+"";
+					}                                                                       
+					return null;
+				}
+			});
+			
+			
+			
+
+
 		}
+	}
+	private double getAvgPrice(Product product) {
+		// TODO Auto-generated method stub
+		double[][] price = product.getProductInShops();
+		double all = 0;
+		for(int i = 1; i<=price[0][1];i++){
+			all+=price[i][3];
+		}
+		return all/price[0][1];
+	}
 
-
-
+	private double getPriceShopId(Product product, int shopId) {
+		// TODO Auto-generated method stub
+		double[][] price = product.getProductInShops();
+		for (int i = 1; i<=price[0][1];i++){
+			if(price[i][1] == shopId)
+				return price[i][3];
+		}
+		return 0;
 	}
 
 	private void searchField(){
@@ -182,11 +238,36 @@ public class SearchPage extends CustomComponent implements View {
 		searchMenuContent.addComponent(searchText);
 		searchMenuContent.addComponent(counter);
 
+
+		select = new ComboBox("Select a shop");
+		try {
+			ArrayList<Shop> shops = DAOFactory.getInstance().getShopsDAO().getAllShop();
+
+			for (Shop shop : shops) {
+
+				select.addItem(shop.getShopId());
+				select.setItemCaption(shop.getShopId(), shop.getShopName());
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DAOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+		searchMenuContent.addComponent(select);
+
+
+
 		searchMenuContent.addComponent(new Button("search",
 				new ButtonListener("search")));
+
 		searchMenuContent.setWidth(null);
 		searchMenuContent.setMargin(true);
 		searchMenuPanel.setContent(searchMenuContent);
+
 		hLayout.addComponent(searchMenuPanel);
 	}
 	class ButtonListener implements ClickListener {
@@ -201,9 +282,6 @@ public class SearchPage extends CustomComponent implements View {
 		public ButtonListener(String menuitem) {
 			this.menuitem = menuitem;
 		}
-
-
-
 
 		public void buttonClick(ClickEvent event) {
 			// Navigate to a specific state
