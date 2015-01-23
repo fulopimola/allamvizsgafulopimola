@@ -16,5 +16,6 @@
 			<attribute name="owner.project.facets" value="java"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="D:/allamvizsga/CCWP/WebContent/WEB-INF/lib/my-chameleon1.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
