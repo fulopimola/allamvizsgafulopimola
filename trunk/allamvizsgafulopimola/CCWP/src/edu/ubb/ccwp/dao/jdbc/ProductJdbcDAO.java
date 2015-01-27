@@ -77,7 +77,7 @@ public class ProductJdbcDAO implements ProductDAO {
 		// TODO Auto-generated method stub
 		ArrayList<Product> products = new ArrayList<Product>();
 		ArrayList<Product> newproducts = new ArrayList<Product>();
-		System.out.println(catId);
+		//System.out.println(catId);
 		String command = "SELECT * FROM `Products` WHERE `ProductName` LIKE ?";
 
 		if (compId != -1){
