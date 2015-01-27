@@ -3,6 +3,10 @@ package edu.ubb.ccwp.ui;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
+
+import org.apache.tools.ant.types.CommandlineJava.SysProperties;
+
 import com.vaadin.annotations.Theme;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -97,7 +101,7 @@ public class SearchPage extends CustomComponent implements View {
 		table = new Table("All Product!");
 		table.setSelectable(true);
 		table.setImmediate(true);
-		
+
 		//table.setHeight("600px");
 		//table.setWidth("400px");
 		loadProduct();
@@ -151,7 +155,7 @@ public class SearchPage extends CustomComponent implements View {
 		table.addContainerProperty("Rate",  Double.class, null);
 		table.addContainerProperty("Price(avg)",  String.class, null);
 		table.setColumnWidth("Description", 80);
-		
+
 		try {
 			DAOFactory df = DAOFactory.getInstance();
 			ProductDAO prod = df.getProductDAO();
@@ -160,8 +164,21 @@ public class SearchPage extends CustomComponent implements View {
 			int compId = -1;
 			if(compSelect.getValue() != null) compId = ((Company)compSelect.getValue()).getCompanyId();
 			int catId = -1;
-			if(catTree.getValue() != null) catId = Integer.parseInt(catTree.getValue().toString());
-			products = prod.getProductSearch(searchText.getValue(), shopId, compId, catId);
+			
+			System.out.println();
+			if(catTree.getValue() != null){
+				ArrayList<Integer> cats = new ArrayList<Integer>();
+				cats = getAllProductFromCategory( (Integer)catTree.getValue(), catTree);
+				cats.add((Integer)catTree.getValue());
+				for (Integer integer : cats) {
+					System.out.println("van "+integer);
+					products.addAll(prod.getProductSearch(searchText.getValue(), shopId, compId, integer));
+				}
+			}else{
+				products = prod.getProductSearch(searchText.getValue(), shopId, compId, catId);
+			}
+			
+		
 
 
 		} catch (DAOException e) {
@@ -200,7 +217,11 @@ public class SearchPage extends CustomComponent implements View {
 				}
 			});
 		}
+		
 	}
+
+
+
 	private double getAvgPrice(Product product) {
 		// TODO Auto-generated method stub
 		double[][] price = product.getProductInShops();
@@ -272,7 +293,7 @@ public class SearchPage extends CustomComponent implements View {
 
 		try {
 			catTree = DAOFactory.getInstance().getCategoryDAO().getAllCategoryTree();
-			
+
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -317,5 +338,28 @@ public class SearchPage extends CustomComponent implements View {
 			loadProduct();
 
 		}
+	}
+
+	private ArrayList<Integer> getAllProductFromCategory( int catId, TreeTable cattree){
+
+		ArrayList<Integer> catIds = new ArrayList<Integer>();
+		
+		if(catId >= 0){
+			catIds = getAllSubCategoryId(catIds, cattree, catId);
+		}
+
+		return catIds;
+	}
+
+	private ArrayList<Integer> getAllSubCategoryId(ArrayList<Integer> catIds, TreeTable cattree, int catId){
+
+		Collection<Integer> cat = (Collection<Integer>) cattree.getChildren(catId);
+		if(cat != null){
+			for (int object : cat) {
+				catIds.add(object);
+				getAllSubCategoryId(catIds, cattree, object);
+			}
+		}
+		return catIds;
 	}
 }
