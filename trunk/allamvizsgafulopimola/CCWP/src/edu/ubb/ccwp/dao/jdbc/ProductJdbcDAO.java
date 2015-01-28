@@ -9,6 +9,7 @@ import edu.ubb.ccwp.dao.ProductDAO;
 import edu.ubb.ccwp.exception.DAOException;
 import edu.ubb.ccwp.exception.NotInShopException;
 import edu.ubb.ccwp.exception.ProductNotFoundException;
+import edu.ubb.ccwp.exception.RateNotFound;
 import edu.ubb.ccwp.exception.ShopNotFoundException;
 import edu.ubb.ccwp.model.Product;
 
@@ -83,7 +84,7 @@ public class ProductJdbcDAO implements ProductDAO {
 		if (compId != -1){
 			command += "AND `Companys_CompId` = "+compId;
 		}
-		
+
 		if (catId != -1){
 			command += "AND `Categories_CategoryId` = "+catId;
 		}
@@ -91,7 +92,7 @@ public class ProductJdbcDAO implements ProductDAO {
 		PreparedStatement statement = JdbcConnection.getConnection()
 				.prepareStatement(command);
 		statement.setString(1, "%"+likeName+"%");
-		
+
 		ResultSet result = statement.executeQuery();
 
 		while (result.next()) {
@@ -167,6 +168,105 @@ public class ProductJdbcDAO implements ProductDAO {
 		}
 
 		return matrix;
+
+	}
+
+	@Override
+	public int getUserProductRate(int userID, int productId) throws SQLException, DAOException, RateNotFound {
+		String command = "SELECT `Value` FROM `usersratedproducts` WHERE `users_UserID` = ? AND `Products_ProductId` = ?";
+		PreparedStatement statement;
+
+		statement = JdbcConnection.getConnection()
+				.prepareStatement(command);
+		statement.setInt(1, userID);
+		statement.setInt(2, productId);
+
+		ResultSet res = statement.executeQuery();
+		if(res.next()){
+			return res.getInt("Value");
+		}else{
+			throw new RateNotFound();
+		}
+
+	}
+
+	@Override
+	public int updateRate(int userID, int productId, int rate) throws SQLException, DAOException, ProductNotFoundException, NotInShopException {
+		String command = "UPDATE `usersratedproducts` SET `Value`= ? WHERE `users_UserID`=? and`Products_ProductId`=?;";
+		PreparedStatement statement;
+		System.out.println("Update van "+rate);
+
+		statement = JdbcConnection.getConnection()
+				.prepareStatement(command);
+		statement.setInt(1, rate);
+		statement.setInt(2, userID);
+		statement.setInt(3, productId);
+
+		int res = statement.executeUpdate();
+		statement.close();
+		updateProductRate(productId);
+		return res;
+	}
+
+	@Override
+	public int insertRate(int userID, int productId, int rate) throws SQLException, DAOException, ProductNotFoundException, NotInShopException {
+		// TODO Auto-generated method stub
+		String command = "INSERT INTO `usersratedproducts` (`users_UserID`, `Products_ProductId`, `Value`) VALUES (?, ?, ?);";
+		PreparedStatement statement;
+
+		System.out.println("Insert van "+rate);
+		statement = JdbcConnection.getConnection()
+				.prepareStatement(command);
+		statement.setInt(1, userID);
+		statement.setInt(2, productId);
+		statement.setInt(3, rate);
+
+		int res = statement.executeUpdate();
+		statement.close();
+		updateProductRate(productId);
+		return res;
+
+	}
+
+	private void updateProductRate(int prodId) throws SQLException, DAOException, ProductNotFoundException, NotInShopException{
+
+		String command = "SELECT AVG(`Value`) FROM `usersratedproducts` WHERE `Products_ProductId` = ?";
+		PreparedStatement statement;
+
+		statement = JdbcConnection.getConnection()
+				.prepareStatement(command);
+		statement.setInt(1, prodId);
+		ResultSet res = statement.executeQuery();
+		double rateavg = 0;
+		if(res.next()){
+			rateavg = res.getDouble("AVG(`Value`)");
+		}
+
+		Product prod = getProductByProductId(prodId);
+
+		prod.setProductRate(rateavg);
+		updateProduct(prod);
+
+
+	}
+
+	public void updateProduct(Product prod) throws SQLException, DAOException {
+		// TODO Auto-generated method stub
+
+		String command = "UPDATE `products` SET `ProductName`= ?, `Description`= ?, `Rate` = ?, `Companys_CompId` = ?, `Categories_CategoryId` = ? WHERE `ProductId`=?;";
+		PreparedStatement statement;
+
+		statement = JdbcConnection.getConnection()
+				.prepareStatement(command);
+		statement.setString(1, prod.getProductName());
+		statement.setString(2, prod.getProductDescription());
+		statement.setDouble(3, prod.getProductRate());
+		statement.setInt(4, prod.getCompanyId());
+		statement.setInt(5, prod.getCategoryId());
+		statement.setInt(6, prod.getProductId());
+		int res = statement.executeUpdate();
+		statement.close();
+		
 
 	}
 

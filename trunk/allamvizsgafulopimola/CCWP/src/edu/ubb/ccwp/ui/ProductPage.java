@@ -2,21 +2,26 @@ package edu.ubb.ccwp.ui;
 
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 
-import com.google.gwt.dev.jjs.ast.JLabel;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.Slider;
 import com.vaadin.ui.VerticalLayout;
 
 import edu.ubb.ccwp.dao.DAOFactory;
-import edu.ubb.ccwp.dao.ShopDAO;
+import edu.ubb.ccwp.dao.ProductDAO;
 import edu.ubb.ccwp.exception.DAOException;
+import edu.ubb.ccwp.exception.NotInShopException;
+import edu.ubb.ccwp.exception.ProductNotFoundException;
+import edu.ubb.ccwp.exception.RateNotFound;
 import edu.ubb.ccwp.exception.ShopNotFoundException;
 import edu.ubb.ccwp.model.Product;
 import edu.ubb.ccwp.model.Shop;
@@ -32,6 +37,9 @@ public class ProductPage extends CustomComponent implements View{
 	private HorizontalLayout hLayout = new HorizontalLayout();
 	private VerticalLayout textContent;
 	private User user;
+	private Slider slider;
+	private Button saveRate;
+	private int rate = -1;
 
 	public ProductPage(){
 		layout = new VerticalLayout();
@@ -73,8 +81,111 @@ public class ProductPage extends CustomComponent implements View{
 
 
 		//Show Product data
+		GridLayout glay = new GridLayout(2,2);
 		Label productName = new Label("<h1>"+product.getProductName()+"</h1>", ContentMode.HTML);
-		textContent.addComponent(productName);
+		glay.addComponent(productName,0,0);
+		glay.setSizeFull();
+
+		saveRate = new Button("Rate", new Button.ClickListener() {
+			@Override
+			public void buttonClick(ClickEvent event) {
+				System.out.println(slider.getValue());
+				
+				if(rate > 0){
+					try {
+						rate = slider.getValue().intValue();
+
+						ProductDAO pd = DAOFactory.getInstance().getProductDAO();
+						pd.updateRate(user.getUserID(), product.getProductId(), rate);
+						getUI().getNavigator().navigateTo(ProductPage.NAME);
+
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (DAOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (ProductNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (NotInShopException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}else{
+					rate = slider.getValue().intValue();
+
+					ProductDAO pd = DAOFactory.getInstance().getProductDAO();
+					try {
+						pd.insertRate(user.getUserID(), product.getProductId(), rate);
+						getUI().getNavigator().navigateTo(ProductPage.NAME);
+
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (DAOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (ProductNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (NotInShopException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		});
+		if(user != null){
+			if(!user.getUserName().equals("Guest")){
+				ProductDAO pd = DAOFactory.getInstance().getProductDAO();
+
+
+				VerticalLayout hlay = new VerticalLayout();
+				try {
+					rate = pd.getUserProductRate(user.getUserID(), product.getProductId());
+					System.out.println(rate + " az uj rate");
+					slider = new Slider(1,5);
+					slider.setWidth("70px");
+
+					Label label = new Label("Your rate is: "+rate);
+					System.out.println("Your rate is "+rate);
+
+					if(rate>0) slider.setValue((double) rate);
+					hlay.addComponent(label);
+					hlay.addComponent(slider);
+					hlay.addComponent(saveRate);
+					hlay.setWidth("150px");
+					glay.addComponent(hlay,1,1);
+
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (DAOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (RateNotFound e) {
+					// TODO Auto-generated catch block
+					//e.printStackTrace();
+					//nincs meg ertekelve
+					System.out.println("a catch-be vagyok "+rate);
+					Label label = new Label("Rate this product:");
+					slider = new Slider(1,5);
+					slider.setWidth("70px");
+					hlay.addComponent(label);
+					hlay.addComponent(slider);
+					hlay.addComponent(saveRate);
+					hlay.setWidth("150px");
+					glay.addComponent(hlay,1,1);
+
+				}
+
+			}
+		}
+
+
+
+		textContent.addComponent(glay);
 
 		Label productDesc = new Label("<b>Description:<br></b>"+product.getProductDescription(), ContentMode.HTML);
 		textContent.addComponent(productDesc);
@@ -101,6 +212,8 @@ public class ProductPage extends CustomComponent implements View{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+
 
 
 

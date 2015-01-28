@@ -7,6 +7,7 @@ import java.util.Collection;
 
 import org.apache.tools.ant.types.CommandlineJava.SysProperties;
 
+import com.gargoylesoftware.htmlunit.Page;
 import com.vaadin.annotations.Theme;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -177,7 +178,8 @@ public class SearchPage extends CustomComponent implements View {
 			}else{
 				products = prod.getProductSearch(searchText.getValue(), shopId, compId, catId);
 			}
-			
+			//javascript
+			//com.vaadin.server.Page.getCurrent().getJavaScript().execute("alert('Hello')");
 		
 
 
